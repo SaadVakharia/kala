@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateEmail, updatePassword } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,7 +45,7 @@ const SetupPassword: React.FC = () => {
       if (!currentUser.email || currentUser.email !== syntheticEmail) {
         await updateEmail(currentUser, syntheticEmail);
       }
-      
+
       // Set the password
       await updatePassword(currentUser, password);
 
@@ -71,7 +71,7 @@ const SetupPassword: React.FC = () => {
         <div className="flex justify-center mb-8">
           <img src={logo} alt="Kala Logo" className="w-24 h-auto object-contain" />
         </div>
-        
+
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Set Your Password</h2>
           <p className="text-sm text-gray-500 mt-2">Create a secure password for future logins.</p>
@@ -87,9 +87,9 @@ const SetupPassword: React.FC = () => {
           <div className="space-y-2">
             <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">New Password</Label>
             <div className="relative flex items-center shadow-sm rounded-xl">
-              <Input 
+              <Input
                 type="password"
-                placeholder="Enter new password" 
+                placeholder="Enter new password"
                 className="px-4 pr-12 py-7 bg-white border-gray-200 rounded-xl text-lg font-medium focus:border-primary focus:ring-primary transition-colors"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -101,9 +101,9 @@ const SetupPassword: React.FC = () => {
           <div className="space-y-2">
             <Label className="text-xs font-bold text-gray-700 uppercase tracking-wider">Confirm Password</Label>
             <div className="relative flex items-center shadow-sm rounded-xl">
-              <Input 
+              <Input
                 type="password"
-                placeholder="Confirm new password" 
+                placeholder="Confirm new password"
                 className="px-4 pr-12 py-7 bg-white border-gray-200 rounded-xl text-lg font-medium focus:border-primary focus:ring-primary transition-colors"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
