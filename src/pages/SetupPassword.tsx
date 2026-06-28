@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateEmail, updatePassword } from 'firebase/auth';
+import { EmailAuthProvider, linkWithCredential, updatePassword } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,13 +41,13 @@ const SetupPassword: React.FC = () => {
       const phone = currentUser.phoneNumber || `+91${appUser.phone}`;
       const syntheticEmail = `${phone}@kala.local`;
 
-      // Update email if necessary
-      if (!currentUser.email || currentUser.email !== syntheticEmail) {
-        await updateEmail(currentUser, syntheticEmail);
+      // Link the new email and password to the current phone account
+      if (!currentUser.email) {
+        const credential = EmailAuthProvider.credential(syntheticEmail, password);
+        await linkWithCredential(currentUser, credential);
+      } else {
+        await updatePassword(currentUser, password);
       }
-
-      // Set the password
-      await updatePassword(currentUser, password);
 
       // Update Firestore to indicate password is set
       const userRef = doc(db, 'users', currentUser.uid);
