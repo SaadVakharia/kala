@@ -26,9 +26,11 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (currentUser && !authLoading) {
-      if (appUser && appUser.passwordSet === false) {
+      if (appUser === null) {
+        navigate('/setup', { replace: true });
+      } else if (!appUser.passwordSet) {
         navigate('/setup-password', { replace: true });
-      } else if (appUser) {
+      } else {
         navigate(from, { replace: true });
       }
     }
