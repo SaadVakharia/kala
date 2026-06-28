@@ -1,12 +1,15 @@
 import React from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
-import { Home, Users, Briefcase, MapPin, Bell, User, LogOut } from 'lucide-react';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Users, Briefcase, Bell, MoreHorizontal, ArrowLeft, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import logo from '@/assets/logo.png';
 
 const AppLayout: React.FC = () => {
   const { appUser } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -16,40 +19,65 @@ const AppLayout: React.FC = () => {
     }
   };
 
+  // Nav items based on the design PDF bottom bar
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Home, roles: ['Super Admin', 'Admin', 'General Manager', 'Project Manager', 'Site Supervisor', 'Client'] },
-    { name: 'Users', path: '/users', icon: Users, roles: ['Super Admin', 'Admin', 'General Manager'] },
     { name: 'Projects', path: '/projects', icon: Briefcase, roles: ['Super Admin', 'Admin', 'General Manager', 'Project Manager'] },
-    { name: 'Sites', path: '/sites', icon: MapPin, roles: ['Super Admin', 'Admin', 'General Manager', 'Project Manager', 'Site Supervisor'] },
+    { name: 'Users', path: '/users', icon: Users, roles: ['Super Admin', 'Admin', 'General Manager'] },
   ];
 
   const filteredNavItems = navItems.filter(item => 
     appUser && item.roles.includes(appUser.role)
   );
 
+  // Is this a deep route (not a main tab) to show back button instead of menu?
+  const isDeepRoute = location.pathname !== '/dashboard' && location.pathname !== '/projects' && location.pathname !== '/users';
+
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 w-full">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
-          <span className="text-xl font-bold text-primary">Kala Group</span>
+    <div className="flex h-screen bg-gray-50 w-full font-sans">
+      
+      {/* Mobile Top App Bar (Design precise) */}
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-50">
+        <button 
+          onClick={() => isDeepRoute ? navigate(-1) : null}
+          className="p-1 -ml-1 text-gray-700"
+        >
+          {isDeepRoute ? <ArrowLeft className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+        
+        <div className="flex flex-col items-center justify-center flex-1">
+          <img src={logo} alt="Kala Logo" className="h-10 w-auto object-contain" />
         </div>
         
-        <nav className="flex-1 overflow-y-auto py-4">
-          <ul className="space-y-1 px-3">
+        <button className="relative p-1 -mr-1 text-gray-700">
+          <Bell className="h-6 w-6" />
+          <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[8px] text-white font-bold border border-white">
+            4
+          </span>
+        </button>
+      </header>
+
+      {/* Desktop Sidebar (Retained for larger screens but stylized) */}
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100">
+        <div className="flex flex-col items-center justify-center h-20 border-b border-gray-100">
+          <img src={logo} alt="Kala Logo" className="h-14 w-auto object-contain mt-2" />
+        </div>
+        
+        <nav className="flex-1 py-6">
+          <ul className="space-y-1 px-4">
             {filteredNavItems.map((item) => (
               <li key={item.name}>
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                    `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                       isActive 
-                        ? 'bg-primary/10 text-primary' 
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'bg-red-50 text-primary' 
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`
                   }
                 >
-                  <item.icon className="mr-3 h-5 w-5" />
+                  <item.icon className={`mr-3 h-5 w-5 ${location.pathname === item.path ? 'text-primary' : 'text-gray-400'}`} />
                   {item.name}
                 </NavLink>
               </li>
@@ -57,81 +85,69 @@ const AppLayout: React.FC = () => {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-100">
           <div className="flex items-center mb-4">
-            <div className="flex-shrink-0">
-              <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                {appUser?.fullName?.charAt(0) || 'U'}
-              </div>
+            <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-primary font-bold">
+              {appUser?.fullName?.charAt(0) || 'U'}
             </div>
             <div className="ml-3 truncate">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{appUser?.fullName}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{appUser?.role}</p>
+              <p className="text-sm font-semibold text-gray-900 truncate">{appUser?.fullName}</p>
+              <p className="text-xs text-gray-500 truncate">{appUser?.role}</p>
             </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="flex w-full items-center px-3 py-2 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            className="w-full py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
           >
-            <LogOut className="mr-3 h-5 w-5" />
             Logout
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header */}
-        <header className="flex-shrink-0 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="md:hidden flex items-center">
-            <span className="text-xl font-bold text-primary">Kala Group</span>
-          </div>
-          <div className="flex items-center ml-auto space-x-4">
-            <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 relative">
-              <Bell className="h-6 w-6" />
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
-            </button>
-          </div>
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white md:bg-gray-50 pt-14 md:pt-0 pb-16 md:pb-0">
+        {/* Desktop Header */}
+        <header className="hidden md:flex h-16 bg-white border-b border-gray-100 items-center justify-end px-8">
+           <button className="relative p-2 text-gray-600 hover:bg-gray-50 rounded-full">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white font-bold border-2 border-white">
+              4
+            </span>
+          </button>
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 overflow-auto bg-gray-50 md:p-8">
           <Outlet />
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
-        <nav className="flex justify-around">
-          {filteredNavItems.slice(0, 4).map((item) => (
+      {/* Mobile Bottom Navigation (Design precise) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 pb-safe">
+        <nav className="flex justify-around items-center h-16">
+          {filteredNavItems.map((item) => (
             <NavLink
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `flex flex-col items-center py-3 px-2 text-xs font-medium ${
-                  isActive 
-                    ? 'text-primary' 
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                `flex flex-col items-center justify-center w-full h-full space-y-1 ${
+                  isActive ? 'text-primary' : 'text-gray-400'
                 }`
               }
             >
-              <item.icon className="h-6 w-6 mb-1" />
-              {item.name}
+              <item.icon className="h-[22px] w-[22px]" strokeWidth={location.pathname === item.path ? 2.5 : 2} />
+              <span className="text-[10px] font-medium">{item.name}</span>
             </NavLink>
           ))}
-          <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `flex flex-col items-center py-3 px-2 text-xs font-medium ${
-                isActive 
-                  ? 'text-primary' 
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`
-            }
+          
+          {/* More Tab */}
+          <button
+            onClick={handleLogout}
+            className="flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-400"
           >
-            <User className="h-6 w-6 mb-1" />
-            Profile
-          </NavLink>
+            <MoreHorizontal className="h-[22px] w-[22px]" />
+            <span className="text-[10px] font-medium">More</span>
+          </button>
         </nav>
       </div>
     </div>

@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Setup: React.FC = () => {
-  const [companyName, setCompanyName] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
@@ -65,7 +64,7 @@ const Setup: React.FC = () => {
       const companyId = "KG_COMP_01";
       await setDoc(doc(db, 'companies', companyId), {
         id: companyId,
-        name: companyName,
+        name: "Kala Group",
         superAdminId: currentUser.uid,
         createdAt: Date.now()
       });
@@ -111,17 +110,6 @@ const Setup: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSetup} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
-              <Input 
-                id="companyName" 
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                required
-                disabled={loading}
-                placeholder="e.g. Kala Group"
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="fullName">Super Admin Name</Label>
               <Input 

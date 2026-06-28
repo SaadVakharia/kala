@@ -18,7 +18,7 @@ export type Role =
   | "Project Sales Officer" 
   | "Client";
 
-export type Status = "Active" | "Inactive";
+export type Status = "Active" | "Inactive" | "Pending";
 
 export interface User {
   uid: string;
@@ -34,6 +34,7 @@ export interface User {
   panNumber?: string;
   panFile?: string; // URL
   photoURL?: string;
+  passwordSet?: boolean;
   createdBy?: string;
   createdAt: number;
   updatedAt: number;

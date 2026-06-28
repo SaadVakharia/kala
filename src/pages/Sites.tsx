@@ -7,7 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, MapPin } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 const Sites: React.FC = () => {
+  const navigate = useNavigate();
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,7 +46,7 @@ const Sites: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight">Sites</h1>
           <p className="text-muted-foreground">Manage work sites and their progress.</p>
         </div>
-        <Button className="shrink-0 w-full sm:w-auto">
+        <Button onClick={() => navigate('/sites/create')} className="shrink-0 w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" /> Add New Site
         </Button>
       </div>

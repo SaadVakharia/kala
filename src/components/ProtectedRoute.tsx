@@ -18,6 +18,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Force password setup if not done
+  if (appUser && appUser.passwordSet === false) {
+    return <Navigate to="/setup-password" replace />;
+  }
+
   // If we require specific roles and user doesn't have it
   if (allowedRoles && appUser && !allowedRoles.includes(appUser.role)) {
     return <Navigate to="/unauthorized" replace />;
